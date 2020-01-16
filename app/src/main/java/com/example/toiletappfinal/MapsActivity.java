@@ -37,7 +37,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Retrofit;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, View.OnClickListener {
 
@@ -54,6 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final double d2km = 111189.57696D * r2d;
     private static String[] listNames= {"Bus Park Public Toilet","Pashupati Public Toilet","Kantipath Public Toilet","Public Toilet Tapinta","Tourist Rest Room","Public Toilet सार्वजनिक शौचालय","Public Toilet at Purano Buspark","Sauchalaya (Toilet)","Public Paid Toilet","Mangal Bazar Tourist Toilet",
             "Public Toilet"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +70,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         btnear = findViewById(R.id.btnnear);
         btnear.setOnClickListener(this);
+
     }
+
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
         int width = bm.getWidth();
         int height = bm.getHeight();

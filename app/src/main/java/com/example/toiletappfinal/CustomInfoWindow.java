@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import retrofit2.Call;
+import retrofit2.Retrofit;
+
 public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter, GoogleMap.OnInfoWindowClickListener{
     private final View mWindow;
     private Context mContext;
@@ -39,9 +43,13 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter, GoogleMap.
     private static final double r2d = 180.0D / 3.141592653589793D;
     private static final double d2r = 3.141592653589793D / 180.0D;
     private static final double d2km = 111189.57696D * r2d;
+    private Retrofit retrofit;
+    private Visitor visitor;
     public CustomInfoWindow(Context mContext) {
         this.mContext = mContext;
         mWindow = LayoutInflater.from(mContext).inflate(R.layout.custom_info_window, null);
+        retrofit = API_CALL.getAPI_Instance().getRetrofit();
+        visitor = retrofit.create(Visitor.class);
     }
 
     private void rendowWindowText(Marker marker, View view){
@@ -105,8 +113,22 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter, GoogleMap.
         return mWindow;
     }
 
+    void updateVisitor() throws IOException {
+        Call<Void> call = visitor.updateVisitor();
+        call.execute();
+    }
+
     @Override
     public void onInfoWindowClick(Marker marker) {
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+        try {
+            updateVisitor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Double latitude = MapsActivity.TOILETS.get(marker.getTitle())[0];
         Double longitude= MapsActivity.TOILETS.get(marker.getTitle())[1];
         Double meters1 = meters(MapsActivity.currentLocation.getLatitude(),MapsActivity.currentLocation.getLongitude(),latitude,longitude);
